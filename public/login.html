@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | Campus Venture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#172033; --muted:#667085; --line:#dfe5ee; --teal:#0d9488; --teal-dark:#0f766e; --paper:#fff; --soft:#f5f8fa; }
+    * { box-sizing:border-box; }
+    body { min-height:100vh; margin:0; color:var(--ink); background:linear-gradient(135deg,#eef7f6 0%,#f7f8fc 46%,#eef2f8 100%); font-family:Inter,Arial,sans-serif; display:grid; place-items:center; padding:28px 18px; }
+    .page { width:min(100%,960px); min-height:600px; display:grid; grid-template-columns:.92fr 1.08fr; overflow:hidden; border:1px solid rgba(207,217,228,.9); border-radius:24px; background:var(--paper); box-shadow:0 24px 65px rgba(29,48,76,.16); }
+    .welcome { color:#fff; background:linear-gradient(155deg,#0f766e,#115e59); padding:56px 50px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
+    .welcome::after { content:""; position:absolute; width:320px; height:320px; right:-145px; bottom:-135px; border:1px solid rgba(255,255,255,.22); border-radius:50%; box-shadow:0 0 0 34px rgba(255,255,255,.05),0 0 0 68px rgba(255,255,255,.04); }
+    .brand { display:flex; align-items:center; color:#fff; text-decoration:none; z-index:1; }
+    .brand img { width:160px; height:98px; object-fit:contain; background:#fff; border-radius:8px; padding:3px; }
+    .welcome-copy { position:relative; z-index:1; max-width:285px; }
+    .welcome-copy small { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:#99f6e4; font-weight:700; }
+    .welcome h1 { margin:14px 0 16px; font-family:Fraunces,serif; font-size:clamp(32px,4vw,44px); line-height:1.08; letter-spacing:-.03em; }
+    .welcome p { margin:0; color:rgba(255,255,255,.78); font-size:15px; line-height:1.7; }
+    .welcome-foot { position:relative; z-index:1; color:rgba(255,255,255,.68); font-size:13px; }
+    .auth { padding:48px clamp(28px,6vw,68px); display:flex; flex-direction:column; justify-content:center; }
+    .auth-head { margin-bottom:27px; }
+    .auth-head h2 { margin:0 0 8px; font-family:Fraunces,serif; font-size:31px; letter-spacing:-.025em; }
+    .auth-head p { margin:0; color:var(--muted); font-size:14px; line-height:1.55; }
+    .field { margin-bottom:16px; }
+    label { display:block; margin-bottom:7px; font-size:13px; font-weight:700; color:#344054; }
+    input { width:100%; height:48px; border:1px solid var(--line); border-radius:10px; padding:0 13px; color:var(--ink); background:#fff; font:inherit; transition:border-color .2s,box-shadow .2s; }
+    input:focus { outline:0; border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,148,136,.14); }
+    .password-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+    .password-actions { display:flex; gap:12px; align-items:center; }
+    .password-row label { margin:0; }
+    .text-button { padding:0; border:0; background:none; color:var(--teal-dark); cursor:pointer; font:600 12px Inter,Arial,sans-serif; }
+    .primary, .email-link { width:100%; min-height:48px; border:0; border-radius:10px; cursor:pointer; font:700 14px Inter,Arial,sans-serif; transition:transform .15s,box-shadow .15s,background .15s; }
+    .primary { margin-top:7px; color:#fff; background:linear-gradient(135deg,var(--teal),var(--teal-dark)); box-shadow:0 9px 18px rgba(13,118,110,.2); }
+    .primary:hover, .email-link:hover { transform:translateY(-1px); }
+    .primary:disabled, .email-link:disabled { cursor:wait; opacity:.7; transform:none; }
+    .divider { display:flex; align-items:center; gap:12px; margin:23px 0; color:#98a2b3; font-size:12px; }
+    .divider::before,.divider::after { content:""; height:1px; flex:1; background:var(--line); }
+    .email-link { color:#255f5c; background:#edfaf8; border:1px solid #b9e7df; }
+    .message { display:none; margin:16px 0 0; padding:11px 12px; border-radius:9px; font-size:13px; line-height:1.45; }
+    .message.error { background:#fff2f1; color:#b42318; border:1px solid #fecdc9; }
+    .message.success { background:#ecfdf3; color:#067647; border:1px solid #a6f4c5; }
+    .switch { margin:22px 0 0; text-align:center; color:var(--muted); font-size:13px; }
+    .switch button { border:0; padding:0; color:var(--teal-dark); background:none; cursor:pointer; font:700 13px Inter,Arial,sans-serif; }
+    .back { margin-top:25px; text-align:center; font-size:13px; color:var(--muted); }
+    .back a { color:var(--teal-dark); text-decoration:none; font-weight:600; }
+    @media (max-width:720px) { body { padding:0; } .page { min-height:100vh; border:0; border-radius:0; grid-template-columns:1fr; } .welcome { min-height:230px; padding:28px 28px 34px; } .welcome-copy { margin-top:35px; } .welcome h1 { font-size:30px; margin:8px 0; } .welcome-copy p,.welcome-foot { display:none; } .auth { padding:38px 28px; justify-content:start; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="welcome" aria-label="Campus Venture welcome">
+      <a class="brand" href="index.html" aria-label="Campus Ventures home"><img src="images/campus-ventures-logo.jpeg" alt="Campus Ventures — Progress &amp; Growth in Education"></a>
+      <div class="welcome-copy"><small>Property marketplace</small><h1>Find your next opportunity.</h1><p>Sign in to explore school and college property opportunities, save your interests, and connect with our team.</p></div>
+      <div class="welcome-foot">Private, simple, and built for every Campus Venture customer.</div>
+    </section>
+    <section class="auth" aria-labelledby="form-title">
+      <div class="auth-head"><h2 id="form-title">Welcome back</h2><p id="form-subtitle">Sign in with your email and password to continue.</p></div>
+      <form id="auth-form" novalidate>
+        <div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="field" id="password-field"><div class="password-row"><label for="password">Password</label><div class="password-actions"><button class="text-button" id="forgot-password" type="button">Forgot password?</button><button class="text-button" id="show-password" type="button">Show</button></div></div><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="6"></div>
+        <button class="primary" id="submit-button" type="submit">Sign in</button>
+      </form>
+      <div class="divider"><span>or</span></div>
+      <button class="email-link" id="magic-link" type="button">Email me a secure sign-in link</button>
+      <div class="message" id="message" role="alert" aria-live="polite"></div>
+      <p class="switch" id="switch-copy">New to Campus Venture? <button type="button" id="mode-switch">Create an account</button></p>
+      <p class="switch">Administrator? <a href="admin-login.html">Use the admin portal</a></p>
+      <div class="back"><a href="index.html">← Back to homepage</a></div>
+    </section>
+  </main>
+  <script>
+    const API_BASE = window.location.origin === 'null' ? 'http://localhost:3000' : window.location.origin;
+    const form = document.getElementById('auth-form');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const passwordField = document.getElementById('password-field');
+    const submitButton = document.getElementById('submit-button');
+    const message = document.getElementById('message');
+    let mode = 'signin';
+
+    function showMessage(text, type) { message.textContent = text; message.className = 'message ' + type; message.style.display = 'block'; }
+    function getAuthErrorMessage(error, fallback) {
+      console.error('Campus Venture authentication error:', error);
+      if (typeof error?.message === 'string' && error.message.trim()) return error.message;
+      if (typeof error?.error_description === 'string' && error.error_description.trim()) return error.error_description;
+      if (typeof error?.error === 'string' && error.error.trim()) return error.error;
+      if (typeof error?.code === 'string' && error.code.trim()) return error.code.replaceAll('_', ' ');
+      return fallback;
+    }
+    function setBusy(button, busy, text) { button.disabled = busy; button.dataset.label ||= button.textContent; button.textContent = busy ? text : button.dataset.label; }
+    async function apiRequest(path, options) {
+      try {
+        const response = await fetch(API_BASE + path, { headers: { 'Content-Type': 'application/json' }, ...options });
+        const data = await response.json().catch(() => ({}));
+        return response.ok ? { data } : { error: { message: data.message || 'The server could not complete your request.' } };
+      } catch (error) { return { error }; }
+    }
+    function saveLocalUser(user, token) {
+      localStorage.setItem('campus-venture-auth-v1', JSON.stringify({ email: user.email, name: user.name || user.email.split('@')[0], role: user.role }));
+      if (token) localStorage.setItem('campus-venture-token-v1', token);
+    }
+    function setMode(nextMode) {
+      mode = nextMode; message.style.display = 'none';
+      const signup = mode === 'signup';
+      document.getElementById('form-title').textContent = signup ? 'Create your account' : 'Welcome back';
+      document.getElementById('form-subtitle').textContent = signup ? 'Use your email to create a Campus Venture account.' : 'Sign in with your email and password to continue.';
+      submitButton.textContent = signup ? 'Create account' : 'Sign in'; submitButton.dataset.label = submitButton.textContent;
+      document.getElementById('switch-copy').innerHTML = signup ? 'Already have an account? <button type="button" id="mode-switch">Sign in</button>' : 'New to Campus Venture? <button type="button" id="mode-switch">Create an account</button>';
+      document.getElementById('mode-switch').addEventListener('click', () => setMode(signup ? 'signin' : 'signup'));
+      password.autocomplete = signup ? 'new-password' : 'current-password';
+    }
+    document.getElementById('show-password').addEventListener('click', function () { const visible = password.type === 'text'; password.type = visible ? 'password' : 'text'; this.textContent = visible ? 'Show' : 'Hide'; });
+    document.getElementById('mode-switch').addEventListener('click', () => setMode('signup'));
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); message.style.display = 'none';
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      setBusy(submitButton, true, mode === 'signup' ? 'Creating account…' : 'Signing in…');
+      const credentials = { email: email.value.trim(), password: password.value };
+      try {
+        const result = await apiRequest(mode === 'signup' ? '/api/auth/register' : '/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
+        if (result.error) {
+          const errorText = getAuthErrorMessage(result.error, 'We could not complete this request. Check the Supabase Authentication logs and your SMTP configuration.');
+          if (mode === 'signin' && errorText.toLowerCase().includes('invalid login credentials')) {
+            showMessage('That email and password do not match an account. If you are new, choose “Create an account”; otherwise use “Forgot password?” or the secure email link.', 'error');
+          } else { showMessage(errorText, 'error'); }
+          return;
+        }
+        if (result.data.user) saveLocalUser(result.data.user, result.data.token);
+        window.location.href = 'index.html';
+      } catch (error) {
+        showMessage(getAuthErrorMessage(error, 'Unable to reach the authentication service. Check your internet connection and Supabase project URL/key.'), 'error');
+      } finally { setBusy(submitButton, false, ''); }
+    });
+    document.getElementById('magic-link').addEventListener('click', async function () {
+      message.style.display = 'none';
+      if (!email.checkValidity()) { email.reportValidity(); return; }
+      setBusy(this, true, 'Sending secure link…');
+      setBusy(this, false, '');
+      showMessage('Email-link sign-in is not configured yet. Create an account or sign in with your password.', 'error');
+    });
+    document.getElementById('forgot-password').addEventListener('click', async function () {
+      message.style.display = 'none';
+      if (!email.checkValidity()) { email.reportValidity(); return; }
+      showMessage('Password-reset emails are not configured yet. Contact the site administrator to reset your password.', 'error');
+    });
+  </script>
+</body>
+</html>

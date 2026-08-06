@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 150" role="img" aria-labelledby="title desc">
+  <title id="title">Campus Ventures</title>
+  <desc id="desc">A graduation cap and upward arrow representing progress and growth in education.</desc>
+  <defs>
+    <linearGradient id="teal" x1="20" y1="125" x2="145" y2="10" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#083a70"/>
+      <stop offset=".48" stop-color="#087e88"/>
+      <stop offset="1" stop-color="#4ee3b4"/>
+    </linearGradient>
+    <linearGradient id="navy" x1="25" y1="15" x2="105" y2="105" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0b3565"/>
+      <stop offset="1" stop-color="#09556e"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#navy)" d="M17 42 76 9l59 33-59 23L17 42Zm19 10 40 15 40-15v21c-24 16-56 16-80 0V52Z"/>
+  <path fill="#0c426d" d="M33 49v35c0 5-4 9-9 9s-9-4-9-9 4-9 9-9V49h9Z"/>
+  <path fill="none" stroke="url(#teal)" stroke-linecap="round" stroke-width="18" d="M116 102c-12 10-27 15-43 15-28 0-50-21-50-48s23-48 50-48c17 0 32 8 41 20"/>
+  <path fill="none" stroke="#fff" stroke-linecap="round" stroke-width="4" opacity=".88" d="M45 48c16-13 47-15 65-4"/>
+  <path fill="url(#teal)" d="M76 103c-19 0-34-15-34-34s15-34 34-34c13 0 25 7 30 18l13-7C111 27 95 17 76 17 48 17 25 40 25 69s23 52 51 52c15 0 29-6 39-16l-12-12c-7 7-16 10-27 10Z"/>
+  <path fill="url(#teal)" d="m87 78 16 16 51-58 12 12-52 59-16 17-31-31 20-15Z"/>
+  <path fill="#4ee3b4" d="m146 19 29-9-8 30-7-12-54 61-9-9 54-61-5-1Z"/>
+</svg>
