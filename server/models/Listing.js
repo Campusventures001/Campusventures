@@ -10,6 +10,8 @@ const listingSchema = new mongoose.Schema({
   fee: { type: String, default: '' },
   board: { type: String, default: '' },
   state: { type: String, default: '' },
+  established: { type: String, default: '' },
+  bankLoan: { type: String, default: '' },
   extra: { type: String, default: '' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
