@@ -13,7 +13,7 @@ const Inquiry = require('./server/models/Inquiry');
 const Lead = require('./server/models/Lead');
 
 const app = express();
-const port = Number(process.env.PORT || 3000);
+const PORT = process.env.PORT || 10000;
 const jwtSecret = process.env.JWT_SECRET;
 
 if (!jwtSecret) throw new Error('JWT_SECRET is missing. Add a strong value to .env.');
@@ -199,6 +199,6 @@ async function startServer() {
   } catch (error) {
     console.error('MongoDB connection failed — starting without the database. The site will work, but listing/lead sync needs Atlas to be reachable:', error.message);
   }
-  app.listen(port, () => console.log(`Campus Venture is running at http://localhost:${port}`));
+  app.listen(PORT, '0.0.0.0', () => console.log(`Campus Venture is running on port ${PORT}`));
 }
 startServer();
