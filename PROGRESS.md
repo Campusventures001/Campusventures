@@ -25,10 +25,11 @@ Last updated: 17 Aug 2026
 | Rasipuram Vedha Vikas School (6 ac, 2L sqft, 72 rooms) | ₹45 Cr (Negotiable) |
 | Kallakurichi CBSE School | On request |
 | IVL Matric School, Morappur, Dharmapuri (3,800 students) | On request |
-| Bharathi Vidyalaya, Tamil Nadu (14.61 ac, 2.2L sqft, 1,683 students, ₹11.14 Cr income) | On request |
+| Bharathi Vidyalaya, Tamil Nadu (15 ac municipal-limit land, 2,25,689 sqft built, asset valuation ₹510.50 Cr) | ₹510.50 Cr |
 
 ## Server resilience
 - Server starts and serves the site even if MongoDB is down (leads fall back to local storage).
+- `seedNewListings()` now upserts curated `NEW_LISTINGS` by `location` (updates existing rows when details change) instead of only adding new ones — so the Bharathi Vidyalaya record in Atlas updates to the new ₹510.50 Cr asset valuation on next deploy, without a duplicate.
 
 ## Keep-alive
 - Windows scheduled task `CampusVentureKeepAlive` pings the Render site every 10 min (while this PC is on).

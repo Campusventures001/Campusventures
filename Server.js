@@ -1,6 +1,8 @@
 require('dotenv').config();
 
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -15,10 +17,40 @@ const Lead = require('./server/models/Lead');
 const app = express();
 const PORT = process.env.PORT || 10000;
 const jwtSecret = process.env.JWT_SECRET;
+const keepAliveUrl = (process.env.KEEPALIVE_URL || process.env.RENDER_EXTERNAL_URL || 'https://campusventures.in').replace(/\/$/, '');
+const keepAlivePath = process.env.KEEPALIVE_PATH || '/api/health';
+const keepAliveIntervalMs = Number.isFinite(Number(process.env.KEEPALIVE_INTERVAL_MS)) && Number(process.env.KEEPALIVE_INTERVAL_MS) > 0
+  ? Number(process.env.KEEPALIVE_INTERVAL_MS)
+  : 5 * 60 * 1000;
 
 if (!jwtSecret) throw new Error('JWT_SECRET is missing. Add a strong value to .env.');
 app.use(cors());
 app.use(express.json({ limit: '100kb' }));
+
+function pingKeepAliveUrl() {
+  if (process.env.KEEPALIVE_ENABLED === 'false' || !keepAliveUrl) return;
+
+  const target = new URL(keepAlivePath.startsWith('/') ? keepAlivePath : `/${keepAlivePath}`, keepAliveUrl);
+  const client = target.protocol === 'https:' ? https : http;
+
+  const req = client.get(target.toString(), (res) => {
+    res.resume();
+    if (res.statusCode && res.statusCode >= 200 && res.statusCode < 400) {
+      console.log(`Keepalive ping OK (${res.statusCode}): ${target.toString()}`);
+    } else {
+      console.warn(`Keepalive ping returned ${res.statusCode} for ${target.toString()}`);
+    }
+  });
+
+  req.on('error', (error) => {
+    console.warn(`Keepalive ping failed for ${target.toString()}: ${error.message}`);
+  });
+}
+
+if (process.env.KEEPALIVE_ENABLED !== 'false') {
+  pingKeepAliveUrl();
+  setInterval(pingKeepAliveUrl, keepAliveIntervalMs);
+}
 
 const publicUser = (user) => ({ id: user._id, email: user.email, name: user.name, role: user.role });
 const createToken = (user) => jwt.sign({ sub: user._id.toString(), role: user.role }, jwtSecret, { expiresIn: '7d' });
@@ -176,19 +208,30 @@ const NEW_LISTINGS = [
   { location: 'Rasipuram, Namakkal District, Tamil Nadu (Vedha Vikas School)', demand: '₹45 Cr (Negotiable)', plot: '6 Acres', constructed: '2 Lakh Sqft', classUpTo: '10th', students: '500', board: 'CBSE + State Board', state: 'Tamil Nadu', extra: '72 Classrooms; 30,000 Sqft Shed; 11 Buses; RO System; Generator; 5 Labs; 1 Meeting Hall; Capacity 5,000' },
   { location: 'Kallakurichi District, Tamil Nadu (CBSE School)', demand: 'On request', plot: '', constructed: '', classUpTo: '', students: '', board: 'CBSE', state: 'Tamil Nadu', extra: 'Plot and constructed details on request' },
   { location: 'Morappur Block, Dharmapuri District, Tamil Nadu', demand: 'On request', plot: '6.55 Acres (4.05 + 2.50)', constructed: '', classUpTo: '12th (LKG–XII)', students: '3,800 (Matric 3,566 + CBSE 234)', board: 'Matric + CBSE', state: 'Tamil Nadu', established: '2010', extra: 'IVL Matric Hr. Sec. School (Estd 2010, IVL Educational & Charitable Trust); 156 Classrooms; 38 Vehicles; Teaching Staff 181; Non-Teaching Staff 126; Annual Income ₹19.55 Cr; Government Value ₹60.27 Cr; Market Value ₹128.70 Cr; Trust-owned land; English medium; NEET coaching for VI–XII; R.O. purified water; Huge library; Yoga, Karate, Skating, Archery, STEM & IIT labs' },
-  { location: 'Bharathi Vidyalaya, Tamil Nadu', demand: 'On request', plot: '14.61 Acres', constructed: '2.20 Lakh Sqft', classUpTo: '12th', students: '1,683 (Matric 1,233 + CBSE 450)', fee: 'Fee income ₹9.43 Cr/yr', board: 'Matric + CBSE', state: 'Tamil Nadu', extra: 'Bharathi Vidyalaya Matric Hr. Sec. School + Bharathi Vidyalaya CBSE School; Total Income ₹11.14 Cr/yr (Fees ₹9.43 Cr + Vans ₹1.20 Cr + Hostel ₹0.50 Cr); Total Expenses ₹5 Cr; Net Profit ₹6.14 Cr/yr; 30 Buses; Hostel 50 students; Exact district on request' }
+  { location: 'Bharathi Vidyalaya, Tamil Nadu', demand: '₹510.50 Cr', plot: '15 Acres (Municipal Limit)', constructed: '2,25,689 Sq.Ft', classUpTo: '12th', students: '1,683 (Matric 1,233 + CBSE 450)', fee: 'Fee income ₹9.43 Cr/yr', board: 'Matric + CBSE', state: 'Tamil Nadu', extra: 'Asset Valuation ₹510.50 Cr — Land 15 Acres (Municipal Limit; Market Value ₹22–25 Cr/Acre; Guideline Value ₹7 Cr/Acre) ₹375 Cr; Buildings 2,25,689 Sq.Ft (Indoor Sports Stadium 25,441 Sq.Ft ₹6 Cr; A Block 25,441 Sq.Ft; B Block 19,419 Sq.Ft; C Block 13,842 Sq.Ft; D Block 51,630 Sq.Ft ₹68 Cr; CBSE Block 24,597 Sq.Ft; Kids Block 30,972 Sq.Ft; Hostel Block 34,310 Sq.Ft); Furniture ₹0.50 Cr; Fans & Lights ₹0.20 Cr; Generator (1.25 KV & 85 KV) ₹0.10 Cr; Vehicles 38 Nos ₹3.20 Cr; Projectors 20 Nos ₹0.20 Cr; AC 25 Nos ₹0.10 Cr; Sports Equipment ₹1 Cr; Lab Equipment ₹1 Cr; Kitchen Equipment & Vessels ₹1 Cr; Hostel Cot & Bed ₹0.50 Cr; Skating Ground ₹0.50 Cr; Basketball Ground ₹0.50 Cr; Kids Modern Playground ₹0.60 Cr; Sewage Plant ₹0.70 Cr; Cycle Stand ₹0.20 Cr; Vehicle Shed ₹0.20 Cr; Store Room ₹0.25 Cr; Waste Godown ₹0.30 Cr; Generator Shed ₹0.15 Cr; Interior Work ₹0.30 Cr; Goodwill ₹50 Cr; Total ₹510.50 Cr; Bharathi Vidyalaya Matric Hr. Sec. School + Bharathi Vidyalaya CBSE School; Total Income ₹11.14 Cr/yr (Fees ₹9.43 Cr + Vans ₹1.20 Cr + Hostel ₹0.50 Cr); Total Expenses ₹5 Cr; Net Profit ₹6.14 Cr/yr; Hostel 50 students; Exact district on request' }
 ];
 
 async function seedNewListings() {
   if (!NEW_LISTINGS.length) return;
   const admin = await User.findOne({ role: 'admin' });
   if (!admin) return;
+  const keys = ['location', 'demand', 'plot', 'constructed', 'classUpTo', 'students', 'fee', 'board', 'state', 'established', 'bankLoan', 'extra'];
   let added = 0;
+  let updated = 0;
   for (const item of NEW_LISTINGS) {
-    const exists = await Listing.exists({ location: item.location, demand: item.demand });
-    if (!exists) { await Listing.create({ ...item, createdBy: admin._id }); added++; }
+    const existing = await Listing.findOne({ location: item.location });
+    if (existing) {
+      const changed = keys.some((k) => existing[k] !== item[k]);
+      if (changed) {
+        await Listing.updateOne({ _id: existing._id }, { $set: { ...item, createdBy: existing.createdBy || admin._id } });
+        updated++;
+      }
+    } else {
+      await Listing.create({ ...item, createdBy: admin._id });
+      added++;
+    }
   }
-  if (added) console.log(`Seeded ${added} new listing(s) into the database.`);
+  if (added || updated) console.log(`Seeded ${added} new and updated ${updated} curated listing(s) into the database.`);
 }
 
 async function startServer() {
